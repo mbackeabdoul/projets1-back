@@ -4,98 +4,90 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 exports.register = async (req, res) => {
-    try {
-      const { prenom, nom, email, password } = req.body;
-      
-      // Log des données reçues
-      console.log('Données reçues:', { prenom, nom, email });
-  
-      // Vérifier si l'utilisateur existe déjà
-      let user = await User.findOne({ email });
-      if (user) {
-        console.log('Utilisateur existe déjà');
-        return res.status(400).json({ message: 'Utilisateur déjà existant' });
-      }
-  
-      // Créer un nouvel utilisateur
-      user = new User({ prenom, nom, email, password });
-      
-      // Log avant la sauvegarde
-      console.log('Tentative de sauvegarde de l\'utilisateur');
-      
-      await user.save();
-      
-      // Log après la sauvegarde
-      console.log('Utilisateur sauvegardé avec succès', user);
-  
-      // Générer un token JWT
-      const token = jwt.sign(
-        { id: user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: '1d' }
-      );
-  
-      res.status(201).json({
-        id: user._id,
-        prenom: user.prenom,
-        nom: user.nom,
-        email: user.email,
-        token
-      });
-    } catch (error) {
-      // Log de l'erreur détaillée
-      console.error('Erreur lors de l\'inscription:', error);
-      
-      // Gestion des erreurs de validation Mongoose
-      if (error.name === 'ValidationError') {
-        const messages = Object.values(error.errors).map(err => err.message);
-        return res.status(400).json({ 
-          message: 'Erreur de validation', 
-          errors: messages 
-        });
-      }
-  
-      res.status(500).json({ 
-        message: 'Erreur serveur', 
-        error: error.message 
-      });
-    }
-  };
-
-exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { prenom, nom, email, password } = req.body;
+    
+    console.log('Données reçues:', { prenom, nom, email });
 
-    // Trouver l'utilisateur
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+    let user = await User.findOne({ email });
+    if (user) {
+      console.log('Utilisateur existe déjà');
+      return res.status(400).json({ message: 'Utilisateur déjà existant' });
     }
 
-    // Vérifier le mot de passe
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
-    }
+    // Définir un admin spécifique basé sur l'email
+    const isAdmin = email === 'admin@example.com'; // Remplace par l'email que tu veux
 
-    // Générer un token JWT
+    user = new User({
+      prenom,
+      nom,
+      email,
+      password,
+      role: isAdmin ? 'admin' : 'user' // Admin si email correspond, sinon user
+    });
+    
+    console.log('Tentative de sauvegarde de l\'utilisateur');
+    await user.save();
+    
+    console.log('Utilisateur sauvegardé avec succès', user);
+
     const token = jwt.sign(
-      { id: user._id }, 
-      process.env.JWT_SECRET, 
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    res.json({
+    res.status(201).json({
       id: user._id,
       prenom: user.prenom,
       nom: user.nom,
       email: user.email,
+      role: user.role,
       token
     });
   } catch (error) {
+    console.error('Erreur lors de l\'inscription:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: 'Erreur de validation', errors: messages });
+    }
     res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+
+  exports.login = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+      }
+  
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+      }
+  
+      const token = jwt.sign(
+        { id: user._id, role: user.role }, // Ajoute le rôle ici
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+      );
+  
+      res.json({
+        id: user._id,
+        prenom: user.prenom,
+        nom: user.nom,
+        email: user.email,
+        role: user.role, // Retourne le rôle
+        token
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Erreur serveur', error: error.message });
+    }
+  };
+
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;

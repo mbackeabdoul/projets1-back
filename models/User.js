@@ -25,6 +25,11 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Mot de passe requis'],
     minlength: [6, 'Le mot de passe doit contenir au moins 6 caractères']
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'], // Seuls ces deux rôles sont permis
+    default: 'user' // Par défaut, un nouvel utilisateur est "user"
+  },
   passwordResetToken: String,
   passwordResetExpires: Date,
   createdAt: {
@@ -35,11 +40,8 @@ const UserSchema = new mongoose.Schema({
 
 // Middleware pour hasher le mot de passe avant la sauvegarde
 UserSchema.pre('save', async function(next) {
-  // Ne hasher le mot de passe que s'il a été modifié
   if (!this.isModified('password')) return next();
-  
   try {
-    // Générer un sel et hasher le mot de passe
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
