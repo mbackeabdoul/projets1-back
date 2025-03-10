@@ -1,23 +1,45 @@
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/db');
-require('dotenv').config();
+const express = require("express")
+const cors = require("cors")
+const connectDB = require("./config/db")
+const path = require("path")
+require("dotenv").config()
 
-const app = express();
+// Initialisation de l'application Express
+const app = express()
 
-connectDB(); // Cela appellera aussi createDefaultAdmin
+// Connexion à la base de données
+connectDB()
 
-app.use(express.json());
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://votre-domaine.com'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Middleware
+app.use(express.json())
+app.use(
+  cors({
+    origin: ["http://localhost:3000", process.env.FRONTEND_URL],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+)
 
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/products', require('./routes/products'));
+// Dossier statique pour les uploads (si nécessaire)
+app.use("/uploads", express.static(path.join(__dirname, "upload")))
 
-const PORT = process.env.PORT || 5000;
+// Routes
+app.use("/api/auth", require("./routes/auth"))
+app.use("/api/products", require("./routes/products"))
+
+// Route de base pour vérifier que le serveur fonctionne
+app.get("/", (req, res) => {
+  res.send("API is running...")
+})
+
+// Gestion des erreurs 404
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" })
+})
+
+// Port et démarrage du serveur
+const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
-});
+  console.log(`Serveur démarré sur le port ${PORT}`)
+})
+
