@@ -17,14 +17,13 @@ const auth = async (req, res, next) => {
 
     // Vérifier le token
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    
-    req.user = decoded;
-    // Ajouter l'utilisateur à la requête
-    // req.user = await User.findById(decoded.id).select("-password")
 
-    // if (!req.user) {
-    //   return res.status(401).json({ message: "Non autorisé, utilisateur non trouvé" })
-    // }
+    // Ajouter l'utilisateur à la requête
+    req.user = await User.findById(decoded.id).select("-password")
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé, utilisateur non trouvé" })
+    }
 
     next()
   } catch (error) {

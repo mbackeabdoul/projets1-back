@@ -2,14 +2,10 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
-  prenom: {
+ 
+  name: {
     type: String,
-    required: [true, 'Prénom requis'],
-    trim: true
-  },
-  nom: {
-    type: String,
-    required: [true, 'Nom requis'],
+    required: true,
     trim: true
   },
   email: {
@@ -25,7 +21,7 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Mot de passe requis'],
     minlength: [6, 'Le mot de passe doit contenir au moins 6 caractères']
   },
-  role: {
+  isAdmin: {
     type: String,
     enum: ['user', 'admin'], // Seuls ces deux rôles sont permis
     default: 'user' // Par défaut, un nouvel utilisateur est "user"

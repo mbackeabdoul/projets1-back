@@ -1,6 +1,6 @@
 const Product = require("../models/Product")
 const fs = require("fs")
-const { cloudinary } = require("../config/cloudnary")
+const  cloudinary  = require("../config/cloudnary")
 
 // @desc    Récupérer tous les produits
 // @route   GET /api/products
@@ -37,6 +37,8 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = async (req, res) => {
+  console.log("Cloudinary:", cloudinary)
+  console.log("🔑 CLOUDINARY SECRET:", process.env.CLOUDINARY_API_SECRET);
   try {
     const { name, price, category, size, color, description } = req.body
 

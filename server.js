@@ -21,7 +21,7 @@ app.use(
 )
 
 // Dossier statique pour les uploads (si nécessaire)
-app.use("/uploads", express.static(path.join(__dirname, "upload")))
+app.use("/upload", express.static(path.join(__dirname, "upload")))
 
 // Routes
 app.use("/api/auth", require("./routes/auth"))

@@ -17,8 +17,8 @@ const login = async (req, res) => {
     }
 
     // Vérifier si le mot de passe correspond
-    const isMatch = await user.comparePassword(password);
-    
+    const isMatch = await user.comparePassword(password)
+
     if (!isMatch) {
       return res.status(401).json({ message: "Email ou mot de passe invalide" })
     }
@@ -53,6 +53,8 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "Cet utilisateur existe déjà" })
     }
 
+      
+
     // Créer un nouvel utilisateur
     const user = await User.create({
       name,
@@ -81,7 +83,7 @@ const register = async (req, res) => {
 // @access  Private
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password")
+    const user = await User.findById(req.user._id).select("-password")
 
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" })
