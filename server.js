@@ -37,6 +37,8 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" })
 })
 
+// Dans server.js
+app.use('/api/favorites', require('./routes/favorites'));
 
 // Ajoutez cette ligne avec vos autres imports de routes
 const paymentRoutes = require('./routes/payments');
