@@ -15,9 +15,9 @@ router.get("/", getProducts)
 router.get("/:id", getProductById)
 
 // Routes protégées (admin seulement)
-router.post("/", [  upload.single("image")], createProduct)
-router.put("/:id", [auth, isAdmin, upload.single("image")], updateProduct)
-router.delete("/:id", [auth, isAdmin], deleteProduct)
+router.post("/", auth, upload.single("image"), createProduct)
+router.put("/:id", auth, isAdmin, upload.single("image"), updateProduct)
+router.delete("/:id", auth, isAdmin, deleteProduct)
 
 module.exports = router
 
