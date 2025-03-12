@@ -14,7 +14,7 @@ connectDB()
 app.use(express.json())
 app.use(
   cors({
-    origin: ["projet1stage-figma.netlify.app", process.env.FRONTEND_URL],
+    origin: ["https://projet1stage-figma.netlify.app", process.env.FRONTEND_URL],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
