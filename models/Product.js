@@ -21,6 +21,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true 
   },
+ genre: { 
+    type: String,
+    required: true 
+  },
   size: { 
     type: String 
   },

@@ -1,6 +1,7 @@
 // routes/payments.js
 const express = require('express');
 const router = express.Router();
+<<<<<<< HEAD
 const PaydunyaService = require('../utils/paydunyaService');
 
 const paydunyaService = new PaydunyaService();
@@ -45,5 +46,24 @@ router.post('/paydunya', async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+=======
+const { addFavorite,
+  getFavorites,
+  checkFavorite,
+  removeFavorite,} = require('../controllers/favoriteController');
+const { auth } = require('../middleware/auth');
+
+// Ajouter un produit aux favoris
+router.post('/add', auth, addFavorite);
+
+// Récupérer tous les favoris d'un utilisateur
+router.get('/', auth, getFavorites);
+
+// Supprimer un favori
+router.delete('/:favoriteId', auth, removeFavorite);
+
+// Vérifier si un produit est dans les favoris
+router.get('/check/:productId', auth, checkFavorite);
+>>>>>>> 83bfd30613a2300cd01198077308fd6e6b04ecf9
 
 module.exports = router;

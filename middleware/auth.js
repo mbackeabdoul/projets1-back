@@ -1,38 +1,28 @@
-const jwt = require("jsonwebtoken")
-const User = require("../models/User")
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-// Middleware pour vérifier le token JWT
+// Middleware d'authentification
 const auth = async (req, res, next) => {
-  try {
-    let token
+  let token;
 
-    // Vérifier si le token est présent dans les headers
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-      token = req.headers.authorization.split(" ")[1]
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    try {
+      token = req.headers.authorization.split(" ")[1]; // Récupérer uniquement le token
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      req.user = await User.findById(decoded.id).select("-password"); // Exclure le mot de passe
+
+      next();
+    } catch (error) {
+      console.error("Erreur d'authentification:", error);
+      return res.status(401).json({ message: "Token invalide ou expiré" });
     }
-
-    if (!token) {
-      return res.status(401).json({ message: "Non autorisé, token manquant" })
-    }
-
-    // Vérifier le token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
-    // Ajouter l'utilisateur à la requête
-    req.user = await User.findById(decoded.id).select("-password")
-
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé, utilisateur non trouvé" })
-    }
-
-    next()
-  } catch (error) {
-    console.error("Erreur d'authentification:", error)
-    res.status(401).json({ message: "Non autorisé, token invalide" })
+  } else {
+    return res.status(401).json({ message: "Non autorisé, token manquant" });
   }
-}
+};
 
-// Middleware pour vérifier si l'utilisateur est admin
 const isAdmin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
     next()
@@ -41,5 +31,4 @@ const isAdmin = (req, res, next) => {
   }
 }
 
-module.exports = { auth, isAdmin }
-
+module.exports = { auth, isAdmin };
