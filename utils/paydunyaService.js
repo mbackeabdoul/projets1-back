@@ -2,12 +2,21 @@
 class PaydunyaService {
   constructor() {
     this.baseUrl = process.env.NEXT_PUBLIC_PAYDUNYA_API_URL || 'https://app.paydunya.com/api/v1';
-    this.masterKey = process.env.PAYDUNYA_MASTER_KEY || 'XuujCrAi-w5E0-ikK9-DCQ0-gHK2Iv5DxMbR';
-    this.privateKey = process.env.PAYDUNYA_PRIVATE_KEY || 'test_private_kWtjrEwJzg9IGWCHpzHCLegbKkR';
-    this.publicKey = process.env.PAYDUNYA_PUBLIC_KEY || 'test_public_XALAp5YR0goLypVeo89NxZkxjeO';
-    this.token = process.env.PAYDUNYA_TOKEN || 'alFEWH7gfGwHxXZmKza7';
+    this.masterKey = process.env.PAYDUNYA_MASTER_KEY;
+    this.privateKey = process.env.PAYDUNYA_PRIVATE_KEY;
+    this.publicKey = process.env.PAYDUNYA_PUBLIC_KEY;
+    this.token = process.env.PAYDUNYA_TOKEN;
+
+    // Log pour vérifier les clés
+    console.log('PayDunya Config:', {
+      baseUrl: this.baseUrl,
+      masterKey: this.masterKey ? 'Set' : 'Missing',
+      privateKey: this.privateKey ? 'Set' : 'Missing',
+      publicKey: this.publicKey ? 'Set' : 'Missing',
+      token: this.token ? 'Set' : 'Missing'
+    });
   }
-  
+
   getHeaders() {
     return {
       'PAYDUNYA-MASTER-KEY': this.masterKey,
@@ -20,48 +29,27 @@ class PaydunyaService {
 
   async createInvoice(data) {
     try {
+      console.log('Creating PayDunya invoice with data:', JSON.stringify(data, null, 2));
       const response = await fetch(`${this.baseUrl}/checkout-invoice/create`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(data)
       });
-      
-      return await response.json();
+
+      const responseData = await response.json();
+      console.log('PayDunya Response Status:', response.status);
+      console.log('PayDunya Response Data:', JSON.stringify(responseData, null, 2));
+
+      if (!response.ok) {
+        throw new Error(`PayDunya API error: ${response.status} - ${responseData.message || 'Unknown error'}`);
+      }
+
+      return responseData;
     } catch (error) {
       console.error('Error creating PayDunya invoice:', error);
       throw error;
     }
   }
-  
-  async checkInvoiceStatus(token) {
-    try {
-      const response = await fetch(`${this.baseUrl}/checkout-invoice/confirm/${token}`, {
-        method: 'GET',
-        headers: this.getHeaders()
-      });
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error checking PayDunya invoice status:', error);
-      throw error;
-    }
-  }
-  
-  async getTransactions(params = {}) {
-    try {
-      const queryString = new URLSearchParams(params).toString();
-      const url = queryString ? `${this.baseUrl}/transactions?${queryString}` : `${this.baseUrl}/transactions`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: this.getHeaders()
-      });
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching PayDunya transactions:', error);
-      throw error;
-    }
-  }
 }
-module.exports = PaydunyaService;
+
+module.exports = PaydunyaService; // Exportation correcte

@@ -5,6 +5,7 @@ const Payment = require('../models/payment');
 // const User = require('../models/user'); // Pour accéder aux informations utilisateur
 
 const paydunya = new PaydunyaService();
+
 /**
  * Crée une nouvelle demande de paiement via PayDunya
  */

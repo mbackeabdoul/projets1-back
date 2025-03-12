@@ -23,28 +23,26 @@ app.use(
 // Dossier statique pour les uploads (si nécessaire)
 app.use("/upload", express.static(path.join(__dirname, "upload")))
 
+// Importation des routes
+// const cartRoutes = require('./routes/cart');
+const paymentRoutes = require('./routes/payments');
 // Routes
 app.use("/api/auth", require("./routes/auth"))
 app.use("/api/products", require("./routes/products"))
+// app.use('/api/cart', cartRoutes);
+app.use('/api/favorites', require('./routes/favorites'));
+app.use('/api/payments', paymentRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get("/", (req, res) => {
   res.send("API is running...")
 })
 
-// Gestion des erreurs 404
+// Gestion des erreurs 404 (à placer après toutes les routes)
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" })
 })
 
-// Dans server.js
-app.use('/api/favorites', require('./routes/favorites'));
-
-// Ajoutez cette ligne avec vos autres imports de routes
-const paymentRoutes = require('./routes/payments');
-
-// Ajoutez cette ligne avec vos autres app.use pour les routes
-app.use('/api/payments', paymentRoutes);
 // Port et démarrage du serveur
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
