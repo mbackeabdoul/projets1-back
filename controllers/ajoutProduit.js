@@ -40,7 +40,7 @@ const createProduct = async (req, res) => {
   console.log("Cloudinary:", cloudinary)
   console.log("🔑 CLOUDINARY SECRET:", process.env.CLOUDINARY_API_SECRET);
   try {
-    const { name, price, category, size, color, description } = req.body
+    const { name, price, category, genre, size, color, description } = req.body
 
     // Vérification des champs obligatoires
     if (!name || !price || !category || !description) {
@@ -65,6 +65,7 @@ const createProduct = async (req, res) => {
       name,
       price,
       category,
+      genre,
       size: size || "",
       color: color || "",
       description,

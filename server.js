@@ -26,6 +26,7 @@ app.use("/upload", express.static(path.join(__dirname, "upload")))
 // Routes
 app.use("/api/auth", require("./routes/auth"))
 app.use("/api/products", require("./routes/products"))
+app.use('/api/favorites', require('./routes/favorites'));
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get("/", (req, res) => {
@@ -38,7 +39,6 @@ app.use((req, res) => {
 })
 
 // Dans server.js
-app.use('/api/favorites', require('./routes/favorites'));
 
 // Ajoutez cette ligne avec vos autres imports de routes
 const paymentRoutes = require('./routes/payments');

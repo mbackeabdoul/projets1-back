@@ -3,7 +3,7 @@ const Favorite = require('../models/favorite');
 const Product = require('../models/Product'); // Supposons que vous avez un modèle de produit
 
 // Ajouter un produit aux favoris
-exports.addFavorite = async (req, res) => {
+const addFavorite = async (req, res) => {
   try {
     const { productId } = req.body;
     const userId = req.user.id;
@@ -50,7 +50,7 @@ exports.addFavorite = async (req, res) => {
 };
 
 // Récupérer tous les favoris d'un utilisateur
-exports.getFavorites = async (req, res) => {
+const getFavorites = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -73,7 +73,7 @@ exports.getFavorites = async (req, res) => {
 };
 
 // Supprimer un favori
-exports.removeFavorite = async (req, res) => {
+const removeFavorite = async (req, res) => {
   try {
     const { favoriteId } = req.params;
     const userId = req.user.id;
@@ -107,7 +107,7 @@ exports.removeFavorite = async (req, res) => {
 };
 
 // Vérifier si un produit est dans les favoris
-exports.checkFavorite = async (req, res) => {
+const checkFavorite = async (req, res) => {
   try {
     const { productId } = req.params;
     const userId = req.user.id;
@@ -128,3 +128,10 @@ exports.checkFavorite = async (req, res) => {
     });
   }
 };
+
+module.exports = {
+  addFavorite,
+  getFavorites,
+  checkFavorite,
+  removeFavorite,
+}
